@@ -1,0 +1,22 @@
+version: '3.9'
+
+services:
+  database:
+    image: mysql:8.0.27
+    hostname: mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: furniture_db
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: adminPass
+    ports:
+      - "3306:3306"
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    ports:
+      - 8080:80
+    environment:
+      - PMA_HOST=mysql
+      - PMA_PORT=3306
