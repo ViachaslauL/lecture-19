@@ -50,48 +50,30 @@ public class SingleTableDAOImpl implements SingleTableDAO {
     public boolean update(FurnitureSingleTable furniture) {
         if (furniture == null) throw new IllegalArgumentException();
 
-        FurnitureSingleTable foundedAddress = null;
-
         try {
-            foundedAddress = entityManager.find(FurnitureSingleTable.class, furniture.getFurnitureId());
+            entityManager.getTransaction().begin();
+            entityManager.merge(furniture);
+            entityManager.getTransaction().commit();
+            return true;
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
-        }
-
-        if (foundedAddress != null) {
-            try {
-                entityManager.getTransaction().begin();
-                entityManager.persist(furniture);
-                entityManager.getTransaction().commit();
-            } catch (Exception e) {
-                LOG.error(e.getMessage(), e);
-                entityManager.getTransaction().rollback();
-            }
-            return true;
+            entityManager.getTransaction().rollback();
         }
         return false;
     }
 
     @Override
     public boolean delete(FurnitureSingleTable furniture) {
-        if (furniture == null) throw new IllegalArgumentException();
+        if (furniture == null || furniture.getFurnitureId() <= 0) throw new IllegalArgumentException();
 
         try {
-            furniture = entityManager.find(FurnitureSingleTable.class, furniture.getFurnitureId());
+            entityManager.getTransaction().begin();
+            entityManager.remove(furniture);
+            entityManager.getTransaction().commit();
+            return true;
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
-        }
-
-        if (furniture != null) {
-            try {
-                entityManager.getTransaction().begin();
-                entityManager.remove(furniture);
-                entityManager.getTransaction().commit();
-                return true;
-            } catch (Exception e) {
-                LOG.error(e.getMessage(), e);
-                entityManager.getTransaction().rollback();
-            }
+            entityManager.getTransaction().rollback();
         }
         return false;
     }

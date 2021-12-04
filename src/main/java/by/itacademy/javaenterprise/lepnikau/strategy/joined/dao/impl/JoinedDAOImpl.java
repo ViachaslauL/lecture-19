@@ -66,22 +66,16 @@ public class JoinedDAOImpl implements JoinedDAO {
     public boolean delete(FurnitureJoined furniture) {
         if (furniture == null) throw new IllegalArgumentException();
 
+        System.out.println(furniture.getFurnitureId());
+
         try {
-            furniture = entityManager.find(FurnitureJoined.class, furniture.getFurnitureId());
+            entityManager.getTransaction().begin();
+            entityManager.remove(furniture);
+            entityManager.getTransaction().commit();
+            return true;
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
-        }
-
-        if (furniture != null) {
-            try {
-                entityManager.getTransaction().begin();
-                entityManager.remove(furniture);
-                entityManager.getTransaction().commit();
-                return true;
-            } catch (Exception e) {
-                LOG.error(e.getMessage(), e);
-                entityManager.getTransaction().rollback();
-            }
+            entityManager.getTransaction().rollback();
         }
         return false;
     }

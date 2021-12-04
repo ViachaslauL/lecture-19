@@ -84,6 +84,13 @@ class SingleTableDAOImplTest {
     @Test
     void updateTest() {
 
+        when(entityManager.getTransaction()).thenReturn(entityTransaction);
+
+        when(entityManager.merge(desk)).thenReturn(desk);
+
+        assertTrue(singleTableDAO.update(desk));
+
+        verify(entityManager, times(1)).merge(desk);
     }
 
     @Test
@@ -93,17 +100,10 @@ class SingleTableDAOImplTest {
 
     @Test
     void deleteTest() {
-        Long furnitureId = desk.getFurnitureId();
 
         when(entityManager.getTransaction()).thenReturn(entityTransaction);
 
-        when(entityManager.find(Mockito.<Class<FurnitureSingleTable>>any(), Mockito.eq(furnitureId)))
-                .thenReturn(desk);
-
         assertTrue(singleTableDAO.delete(desk));
-
-        verify(entityManager, times(1))
-                .find(Mockito.<Class<FurnitureSingleTable>>any(), Mockito.eq(furnitureId));
 
         verify(entityManager, times(1)).remove(desk);
     }
@@ -114,20 +114,11 @@ class SingleTableDAOImplTest {
     }
 
     @Test
-    void deleteTestNonExistentSofa() {
-        /*Long id = -1L;
-        sofa.setFurnitureId(id);
+    void deleteTestWithDeskIdLessThenZero() {
 
-        when(entityManager.getTransaction()).thenReturn(entityTransaction);
+        desk.setFurnitureId(-1L);
 
-        *//*when(entityManager.find(Mockito.<Class<FurnitureJoined>>any(), Mockito.eq(-1L)))
-                .thenReturn(null);*//*
+        assertThrows(IllegalArgumentException.class, () -> singleTableDAO.delete(desk));
 
-        assertFalse(joinedDAO.delete(sofa));
-
-        verify(entityManager, times(1))
-                .find(Mockito.<Class<FurnitureJoined>>any(), Mockito.eq(id));
-
-        verify(entityManager, never()).remove(sofa);*/
     }
 }

@@ -1,7 +1,6 @@
 package by.itacademy.javaenterprise.lepnikau.strategy.tableperclass.dao.impl;
 
 import by.itacademy.javaenterprise.lepnikau.strategy.tableperclass.dao.PerClassDAO;
-import by.itacademy.javaenterprise.lepnikau.strategy.tableperclass.entity.DeskPerClass;
 import by.itacademy.javaenterprise.lepnikau.strategy.tableperclass.entity.SofaPerClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,48 +50,31 @@ public class SofaPerClassDAOImpl implements PerClassDAO<SofaPerClass> {
     public boolean update(SofaPerClass furniture) {
         if (furniture == null) throw new IllegalArgumentException();
 
-        SofaPerClass foundedAddress = null;
-
         try {
-            foundedAddress = entityManager.find(SofaPerClass.class, furniture.getFurnitureId());
+            entityManager.getTransaction().begin();
+            entityManager.merge(furniture);
+            entityManager.getTransaction().commit();
+            return true;
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
-        }
-
-        if (foundedAddress != null) {
-            try {
-                entityManager.getTransaction().begin();
-                entityManager.persist(furniture);
-                entityManager.getTransaction().commit();
-            } catch (Exception e) {
-                LOG.error(e.getMessage(), e);
-                entityManager.getTransaction().rollback();
-            }
-            return true;
+            entityManager.getTransaction().rollback();
         }
         return false;
     }
 
     @Override
     public boolean delete(SofaPerClass furniture) {
-        if (furniture == null) throw new IllegalArgumentException();
+        if (furniture == null || furniture.getFurnitureId() <= 0)
+            throw new IllegalArgumentException();
 
         try {
-            furniture = entityManager.find(SofaPerClass.class, furniture.getFurnitureId());
+            entityManager.getTransaction().begin();
+            entityManager.remove(furniture);
+            entityManager.getTransaction().commit();
+            return true;
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);
-        }
-
-        if (furniture != null) {
-            try {
-                entityManager.getTransaction().begin();
-                entityManager.remove(furniture);
-                entityManager.getTransaction().commit();
-                return true;
-            } catch (Exception e) {
-                LOG.error(e.getMessage(), e);
-                entityManager.getTransaction().rollback();
-            }
+            entityManager.getTransaction().rollback();
         }
         return false;
     }

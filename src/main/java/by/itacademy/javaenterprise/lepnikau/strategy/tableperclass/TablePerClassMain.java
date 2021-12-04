@@ -29,13 +29,21 @@ public class TablePerClassMain {
         deskPerClass.setForm("Rectangle");
         deskPerClass.setMaterial("Pine");
 
-        SofaPerClass sofaPerClass = new SofaPerClass();
-        sofaPerClass.setModelName("Sofa Model");
-        sofaPerClass.setPrice(333.0);
-        sofaPerClass.setType("Sofa Type");
-        sofaPerClass.setPillowsCount(3);
+        SofaPerClass sofa = new SofaPerClass();
+        sofa.setModelName("Sofa Model");
+        sofa.setPrice(333.0);
+        sofa.setType("Sofa Type");
+        sofa.setPillowsCount(3);
 
-        LOG.info(sofaDAO.save(sofaPerClass).toString());
+        LOG.info(sofaDAO.save(sofa).toString());
         LOG.info(deskDao.find(2L).toString());
+
+        SofaPerClass newSofa = sofaDAO.find(2L);
+
+        newSofa.setPillowsCount(2);
+
+        if (sofaDAO.update(newSofa)) {
+            LOG.info("Updated");
+        }
     }
 }
